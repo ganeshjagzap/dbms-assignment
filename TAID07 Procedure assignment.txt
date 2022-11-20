@@ -1,0 +1,184 @@
+mysql> select * from borrower;
++--------+------------+-------------+------------+--------+
+| rollno | name       | dateofissue | nameofbook | status |
++--------+------------+-------------+------------+--------+
+|      1 | Ganesh     | 2022-08-25  | java       | i      |
+|      2 | Prathamesh | 2022-08-15  | DSA        | i      |
+|      3 | Piyush     | 2022-07-22  | MYSQL      | i      |
+|      4 | Pratham    | 2022-07-30  | DBMS       | i      |
+|      5 | Trupti     | 2022-08-01  | MYSQL      | i      |
+|      6 | Revati     | 2022-08-01  | Java       | i      |
++--------+------------+-------------+------------+--------+
+6 rows in set (0.04 sec)
+
+mysql> select * from fine;
+Empty set (0.02 sec)
+
+mysql> describe fine;
++--------+------+------+-----+---------+-------+
+| Field  | Type | Null | Key | Default | Extra |
++--------+------+------+-----+---------+-------+
+| rollno | int  | YES  |     | NULL    |       |
+| dates  | date | YES  |     | NULL    |       |
+| amount | int  | YES  |     | NULL    |       |
++--------+------+------+-----+---------+-------+
+3 rows in set (0.02 sec)
+
+mysql> delimiter //
+mysql> create procedure lib(in rollnum int,bookname varchar(50))
+    -> begin
+    -> declare datedif int;
+    -> declare idate date;
+    -> declare fineamount int;
+    -> declare cdate date;
+    -> declare exit handler for sqlexception select "duplicate values not allowed" as error;
+    -> set cdate=curdate();
+    -> select dateofissue into idate from borrower where rollno=rollnum and nameofbook=bookname;
+    -> set datedif=datediff(cdate,idate);
+    -> if datedif>=15 and datedif<=30 then
+    -> set fineamount=datedif*5;
+    -> insert into fine select rollno,dateofissue,fineamount from borrower where rollno=rollnum;
+    -> select fineamount;
+    -> select * from fine;
+    -> elseif datedif>30 then
+    -> set fineamount=datedif*50;
+    -> insert into fine select rollno,dateofissue,fineamount from borrower where rollno=rollnum;
+    -> select fineamount;
+    -> select * from fine;
+    -> end if;
+    -> update borrower set status='r' where rollno=rollnum and nameofbook=bookname;
+    -> end;
+    -> //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> delimiter ;
+mysql> call lib(1,'java');
++------------+
+| fineamount |
++------------+
+|         75 |
++------------+
+1 row in set (0.01 sec)
+
++--------+------------+--------+
+| rollno | dates      | amount |
++--------+------------+--------+
+|      1 | 2022-08-25 |     75 |
++--------+------------+--------+
+1 row in set (0.02 sec)
+
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> call lib(2,'DSA');
++------------+
+| fineamount |
++------------+
+|        125 |
++------------+
+1 row in set (0.01 sec)
+
++--------+------------+--------+
+| rollno | dates      | amount |
++--------+------------+--------+
+|      1 | 2022-08-25 |     75 |
+|      2 | 2022-08-15 |    125 |
++--------+------------+--------+
+2 rows in set (0.02 sec)
+
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> call lib(3,'mysql');
++------------+
+| fineamount |
++------------+
+|       2450 |
++------------+
+1 row in set (0.00 sec)
+
++--------+------------+--------+
+| rollno | dates      | amount |
++--------+------------+--------+
+|      1 | 2022-08-25 |     75 |
+|      2 | 2022-08-15 |    125 |
+|      3 | 2022-07-22 |   2450 |
++--------+------------+--------+
+3 rows in set (0.01 sec)
+
+Query OK, 1 row affected (0.02 sec)
+
+mysql> call lib(4,'dbms');
++------------+
+| fineamount |
++------------+
+|       2050 |
++------------+
+1 row in set (0.01 sec)
+
++--------+------------+--------+
+| rollno | dates      | amount |
++--------+------------+--------+
+|      1 | 2022-08-25 |     75 |
+|      2 | 2022-08-15 |    125 |
+|      3 | 2022-07-22 |   2450 |
+|      4 | 2022-07-30 |   2050 |
++--------+------------+--------+
+4 rows in set (0.02 sec)
+
+Query OK, 1 row affected (0.04 sec)
+
+mysql> call lib(5,'mysql');
++------------+
+| fineamount |
++------------+
+|       1950 |
++------------+
+1 row in set (0.01 sec)
+
+
++--------+------------+--------+
+| rollno | dates      | amount |
++--------+------------+--------+
+|      1 | 2022-08-25 |     75 |
+|      2 | 2022-08-15 |    125 |
+|      3 | 2022-07-22 |   2450 |
+|      4 | 2022-07-30 |   2050 |
+|      5 | 2022-08-01 |   1950 |
++--------+------------+--------+
+5 rows in set (0.02 sec)
+
+Query OK, 1 row affected (0.04 sec)
+
+mysql> call lib(6,'java');
++------------+
+| fineamount |
++------------+
+|       1950 |
++------------+
+1 row in set (0.01 sec)
+
++--------+------------+--------+
+| rollno | dates      | amount |
++--------+------------+--------+
+|      1 | 2022-08-25 |     75 |
+|      2 | 2022-08-15 |    125 |
+|      3 | 2022-07-22 |   2450 |
+|      4 | 2022-07-30 |   2050 |
+|      5 | 2022-08-01 |   1950 |
+|      6 | 2022-08-01 |   1950 |
++--------+------------+--------+
+6 rows in set (0.02 sec)
+
+Query OK, 1 row affected (0.04 sec)
+
+mysql> select * from borrower;
++--------+------------+-------------+------------+--------+
+| rollno | name       | dateofissue | nameofbook | status |
++--------+------------+-------------+------------+--------+
+|      1 | Ganesh     | 2022-08-25  | java       | r      |
+|      2 | Prathamesh | 2022-08-15  | DSA        | r      |
+|      3 | Piyush     | 2022-07-22  | MYSQL      | r      |
+|      4 | Pratham    | 2022-07-30  | DBMS       | r      |
+|      5 | Trupti     | 2022-08-01  | MYSQL      | r      |
+|      6 | Revati     | 2022-08-01  | Java       | r      |
++--------+------------+-------------+------------+--------+
+6 rows in set (0.00 sec)

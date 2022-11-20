@@ -1,0 +1,28 @@
+
+
+ use student
+switched to db student
+> db.createCollection('sinfo');
+{ "ok" : 1 }
+> db.sinfo.insertMany([{_id:1,sname:"ganesh",marks:90,rank:3,branch:"AI$DS"},{_id:2,sname:'prathamesh',marks:91,rank:2,branch:"AI$DS"},{_id:3,sname:"piyush",marks:93,rank:1,branch:"AI$DS"}])
+{ "acknowledged" : true, "insertedIds" : [ 1, 2, 3 ] }
+
+
+
+db.getCollection("sinfo").find();
+{ "_id" : 1, "sname" : "ganesh", "marks" : 90, "rank" : 3, "branch" : "AI$DS" }
+{ "_id" : 2, "sname" : "prathamesh", "marks" : 91, "rank" : 2, "branch" : "AI$DS" }
+{ "_id" : 3, "sname" : "piyush", "marks" : 93, "rank" : 1, "branch" : "AI$DS" }
+>
+
+var map=function(){emit(this.sname,this.marks);};
+ var reduce=function(sname,marks){return Array.avg(marks);};
+
+
+db.sinfo.mapReduce(map,reduce,{query:{branch:"AI$DS"},out:"Resutdocument"});
+{ "result" : "Resutdocument", "ok" : 1 }
+> db.Resutdocument.find();
+{ "_id" : "ganesh", "value" : 90 }
+{ "_id" : "prathamesh", "value" : 91 }
+{ "_id" : "piyush", "value" : 93 }
+>

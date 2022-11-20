@@ -1,0 +1,151 @@
+
+mysql> use employee;
+Database changed
+mysql> create table oldemployee(emp_id int primary key, name varchar(30));
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> create table newemployee(emp_id int primary key , name varcahr(30));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'varcahr(30))' at line 1
+mysql> create table newemployee(emp_id int primary key , name varchar(30));
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> insert into odlemployee values(1,"Ganesh"),(2,"Prathamesh"),(3,"Piyush"),(4,"tushar");
+ERROR 1146 (42S02): Table 'employee.odlemployee' doesn't exist
+mysql> insert into oldemployee values(1,"Ganesh"),(2,"Prathamesh"),(3,"Piyush"),(4,"tushar");
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from oldemployee;
++--------+------------+
+| emp_id | name       |
++--------+------------+
+|      1 | Ganesh     |
+|      2 | Prathamesh |
+|      3 | Piyush     |
+|      4 | tushar     |
++--------+------------+
+4 rows in set (0.00 sec)
+
+mysql> insert into newemployee values(2,"Prathamesh"),(7,"Mahesh"),(9,"Harshit"),(4,"Tushar"),(10,"Trupti");
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> select * from newemployee;
++--------+------------+
+| emp_id | name       |
++--------+------------+
+|      2 | Prathamesh |
+|      4 | Tushar     |
+|      7 | Mahesh     |
+|      9 | Harshit    |
+|     10 | Trupti     |
++--------+------------+
+5 rows in set (0.00 sec)
+
+
+
+
+
+
+mysql> delimiter //
+mysql> create procedure mearging()
+    -> begin
+    -> declare empid int;
+    -> declare emp_name varchar(30);
+    -> declare loopexit boolean;
+    -> delcare c cursor for select * from oldemployee;
+    -> declare continue handler for not found set loopexit=true;
+    -> open c;
+    -> myloop:Loop
+    -> fetch c into empid,emp_name;
+    -> if not exists(select * from newemployee where emp_id=empdi) then
+    -> insert into newemployee select * from oldemployee where emp_id=empid;
+    -> end if;
+    -> if loopexit then close c;
+    -> leave myloop;
+    -> end if;
+    -> end loop myloop;
+    -> end;
+    -> //
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'c cursor for select * from oldemployee;
+declare continue handler for not found s' at line 6
+mysql> create procedure mearging()
+    -> begin
+    -> declare empid int;
+    -> declare emp_name varchar(30);
+    -> declare loopexit boolean;
+    -> declare c cursor for select * from oldemployee;
+    -> declare continue handler for not found set loopexit=true;
+    -> open c;
+    -> myloop:Loop
+    -> fetch c into empid,emp_name;
+    -> if not exists(select * from newemployee where emp_id=empdi) then
+    -> insert into newemployee select * from oldemployee where emp_id=empid;
+    -> end if;
+    -> if loopexit then close c;
+    -> leave myloop;
+    -> end if;
+    -> end loop myloop;
+    -> end;
+    -> //
+Query OK, 0 rows affected (0.02 sec)
+
+
+mysql> delimiter //
+mysql> create procedure merging()
+    -> begin
+    -> declare empid int;
+    -> declare emp_name varchar(30);
+    -> declare loopexit boolean;
+    -> declare c cursor for select * from oldemployee;
+    -> declare continue handler for not found set loopexit=true;
+    -> open c;
+    -> myloop:Loop
+    -> fetch c into empid,emp_name;
+    -> if not exists(select * from newemployee where emp_id=empid) then
+    -> insert into newemployee select * from oldemployee where emp_id=empid;
+    -> end if;
+    -> if loopexit then close c;
+    -> leave myloop;
+    -> end if;
+    -> end loop myloop;
+    -> end;
+    -> //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> delimiter ;
+mysql> call merging();
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> select * from odlemployee;
+ERROR 1146 (42S02): Table 'employee.odlemployee' doesn't exist
+mysql> select * from oldemployee;
++--------+------------+
+| emp_id | name       |
++--------+------------+
+|      1 | Ganesh     |
+|      2 | Prathamesh |
+|      3 | Piyush     |
+|      4 | tushar     |
++--------+------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from newemployee;
++--------+------------+
+| emp_id | name       |
++--------+------------+
+|      1 | Ganesh     |
+|      2 | Prathamesh |
+|      3 | Piyush     |
+|      4 | Tushar     |
+|      7 | Mahesh     |
+|      9 | Harshit    |
+|     10 | Trupti     |
++--------+------------+
+7 rows in set (0.00 sec)
+
+mysql>
+
+
+
+

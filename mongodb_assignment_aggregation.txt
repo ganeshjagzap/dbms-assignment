@@ -1,0 +1,45 @@
+
+
+
+ use market
+
+  db.createCollection('sales');
+
+ db.sales.insertMany([{'_id':1,'item':'digital watch','price':10000,'quantity':3,'date':ISODate("2014-03-01T08:00:00Z")},{'_id':2,'item':'realme buds 2','price':400,'quantity':6,'date':ISODate('2014-03-01T09:00:00Z')}])
+{ "acknowledged" : true, "insertedIds" : [ 1, 2 ] }
+>
+
+db.sales.find().pretty()
+{
+        "_id" : 1,
+        "item" : "digital watch",
+        "price" : 10000,
+        "quantity" : 3,
+        "date" : ISODate("2014-03-01T08:00:00Z")
+}
+{
+        "_id" : 2,
+        "item" : "realme buds 2",
+        "price" : 400,
+        "quantity" : 6,
+        "date" : ISODate("2014-03-01T09:00:00Z")
+}
+
+
+>db.sales.aggregate({$group:{_id:"$item",Totalprice:{$sum:{$multiply:["$price","$quantity"]}}}})
+{ "_id" : "realme buds 2", "Totalprice" : 2400 }
+{ "_id" : "digital watch", "Totalprice" : 30000 }
+
+
+
+
+> db.sales.aggregate({$group:{_id:"$item",average:{$avg:"$quantity"}}});
+{ "_id" : "realme buds 2", "average" : 6 }
+{ "_id" : "digital watch", "average" : 3 }
+>
+
+
+db.sales.aggregate({$group:{_id:"$item",count_of_item:{$count:{}}}})
+{ "_id" : "realme buds 2", "count_of_item" : 1 }
+{ "_id" : "digital watch", "count_of_item" : 1 }
+>

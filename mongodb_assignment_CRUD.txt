@@ -1,0 +1,41 @@
+
+
+
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+> use student;
+switched to db student
+> db.createCollection('info');
+{ "ok" : 1 }
+
+> db.info.insertMany([{_id:2,'name':'Piyush Waghmare','roll no':12},{_id:3,'name':'Prathamesh Patil','roll no':13}]);
+{ "acknowledged" : true, "insertedIds" : [ 2, 3 ] }
+
+ db.info.find();
+{ "_id" : 1, "name" : "Ganesh Jagzap", "roll no" : 11 }
+{ "_id" : 2, "name" : "Piyush Waghmare", "roll no" : 12 }
+{ "_id" : 3, "name" : "Prathamesh Patil", "roll no" : 13 }
+
+> db.info.find({_id:2});
+{ "_id" : 2, "name" : "Piyush Waghmare", "roll no" : 12 }
+
+> db.info.update({_id:3},{'name':'tushar wagh'});
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.info.find();
+{ "_id" : 1, "name" : "Ganesh Jagzap", "roll no" : 11 }
+{ "_id" : 2, "name" : "Piyush Waghmare", "roll no" : 12 }
+{ "_id" : 3, "name" : "tushar wagh" }
+
+ db.info.remove({_id:2});
+WriteResult({ "nRemoved" : 1 })
+
+
+> db.info.find().pretty();
+{ "_id" : 1, "name" : "Ganesh Jagzap", "roll no" : 11 }
+{ "_id" : 3, "name" : "tushar wagh" }
+>
+
+
+

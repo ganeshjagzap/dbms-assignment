@@ -1,0 +1,61 @@
+mysql> select * from library;
++------+-----------------+-------------------+-------+
+| l_id | bookname        | authorname        | pages |
++------+-----------------+-------------------+-------+
+|    1 | The India Story | Bimal Jalal       |   500 |
+|    2 | Lal Salam       | Smriti Irani      |   677 |
+|    3 | Queen of Fire   | Devika Rangachari |   900 |
+|    4 | Hear Yourself   | Prem Rawat        |   677 |
++------+-----------------+-------------------+-------+
+4 rows in set (0.00 sec)
+
+mysql> create table library_audit(l_id int,bookname varchar(30),updates varchar(100));
+Query OK, 0 rows affected (0.02 sec)
+
+
+mysql> delimiter //
+mysql> create trigger update_log after update on library for each row
+    -> begin
+    -> insert into library_audit values(old.l_id,old.bookname,concat(old.pages,"is changed to",new.pages));
+    -> end
+    -> //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> update library set pages=777 where l_id=2//
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from library_audit//
++------+-----------+---------------------+
+| l_id | bookname  | updates             |
++------+-----------+---------------------+
+|    2 | Lal Salam | 677is changed to777 |
++------+-----------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> update library set pages=999 where l_id=4//
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from library_audit;
+    -> //
++------+---------------+---------------------+
+| l_id | bookname      | updates             |
++------+---------------+---------------------+
+|    2 | Lal Salam     | 677is changed to777 |
+|    4 | Hear Yourself | 677is changed to999 |
++------+---------------+---------------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from library//
++------+-----------------+-------------------+-------+
+| l_id | bookname        | authorname        | pages |
++------+-----------------+-------------------+-------+
+|    1 | The India Story | Bimal Jalal       |   500 |
+|    2 | Lal Salam       | Smriti Irani      |   777 |
+|    3 | Queen of Fire   | Devika Rangachari |   900 |
+|    4 | Hear Yourself   | Prem Rawat        |   999 |
++------+-----------------+-------------------+-------+
+4 rows in set (0.00 sec)
+
+mysql>
